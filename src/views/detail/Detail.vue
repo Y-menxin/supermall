@@ -13,8 +13,8 @@
       <detail-comment-info ref="comment" :rate="rate" />
       <goods-list ref="recommends" :goods="recommends" />
     </scroll>
-    <detail-bottom-bar/>
     <back-top @click.native="backClick" v-show="isShowBackTop" />
+    <detail-bottom-bar @addToCart="addToCart"/>
   </div>
 </template>
 
@@ -34,6 +34,7 @@ import GoodsList from "content/goods/GoodsList";
 import { getDetail, Goods, getRecommend } from "network/detail";
 import { itemListenerMixin, backTopMixin } from "@/common/mixin";
 import { debounce } from "@/common/utils";
+import { mapActions } from "vuex";
 
 export default {
   components: {
@@ -97,6 +98,7 @@ export default {
     getRecommend().then(res => {
       this.recommends = res.data.list;
     });
+    // 商品详情数据 与 标题 联动
     this.getThemeTopY = debounce(() => {
       this.themeTopYs = [];
       this.themeTopYs.push(0);
@@ -108,6 +110,8 @@ export default {
     }, 200);
   },
   methods: {
+    ...mapActions(['addCart']),
+    // 商品详情图片加载完毕
     detaliImgLoad() {
       this.getThemeTopY();
       this.refresh();
@@ -138,7 +142,23 @@ export default {
       }
        // 1.判断 backTop 是否显示
       this.listenShowBtckTop(postion)
-    }
+    },
+    // 将商品添加到购物车 
+    // 1.获取商品对应数据
+    addToCart(){
+      const product = {}
+      product.image = this.topImages[0]
+      product.title = this.goodsInfo.title
+      product.desc = this.goodsInfo.desc
+      product.price = this.goodsInfo.realPrice
+      product.iid = this.iid
+
+    // 将商品添加到购物车 并显示添加商品成功 弹出消息提示
+    // 使用 mapActions + Promise
+    this.addCart(product).then(res => {
+      this.$toast.show(res)
+    })
+}
   }
 };
 </script>
