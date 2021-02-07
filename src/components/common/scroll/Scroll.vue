@@ -18,6 +18,10 @@ export default {
     pullUpLoad: {
       type: Boolean,
       default: false
+    },
+    isBounce:{
+      type:Boolean,
+      default:true
     }
   },
   data() {
@@ -44,9 +48,14 @@ export default {
     // 初始加载时 请求数据需要时间 但 Bscroll已经初始化完成 所以滚动失效 特设置定时器 在 0.8 秒 以后在初始化 Bscroll
     // 但 定时器不是最佳 方案 后续...... 使用 refresh 当数据加载完成后 重新计算可滚动区域
     this.scroll = new Bscroll(this.$refs.wrapper, {
+      // 是否允许点击
       click: true,
+      // 监听滚动的位置
       probeType: this.probeType,
-      pullUpLoad: this.pullUpLoad
+      // 下拉加载更多
+      pullUpLoad: this.pullUpLoad,
+      // 下拉/上拉 滚动到 最底部/顶部 的弹性效果
+      bounce: this.isBounce
     });
 
     // 监听滚动的位置

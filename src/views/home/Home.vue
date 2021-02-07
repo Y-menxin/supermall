@@ -95,13 +95,13 @@ export default {
   },
   // 当组件处于 活动状态 重新调用事件
   activated() {
-    // 监听 goodsitem 组件中 图片加载完成
-    // 使用事件总线 $bus.$on 接收 自定义事件
+    // 监听 goodsitem 组件中 图片加载完成  
     let refresh = debounce(this.$refs.scroll.refresh, 200);
     this.itemImgListener = () => {
       // 当图片加载完成以后 重新计算可滚动区域
       refresh();
     };
+    // 使用事件总线 $bus.$on 接收 自定义事件
     this.$bus.$on("itemImageLoad", this.itemImgListener);
   },
   methods: {

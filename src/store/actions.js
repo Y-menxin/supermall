@@ -12,7 +12,7 @@ export default {
         // 没有添加过 数量为 1 添加到购物车中
         payload.count = 1
         context.commit('addToCate', payload)
-        resolve('添加成功，在购物车等待亲~')
+        resolve('添加商品成功')
       }
     })
   }

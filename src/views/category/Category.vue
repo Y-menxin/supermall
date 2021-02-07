@@ -1,138 +1,116 @@
 <template>
-  <div class="wrapper" ref="aaaa">
-    <ul class="content">
-      <li>列表1</li>
-      <li>列表2</li>
-      <li>列表3</li>
-      <li>列表4</li>
-      <li>列表5</li>
-      <li>列表6</li>
-      <li>列表7</li>
-      <li>列表8</li>
-      <li>列表9</li>
-      <li>列表10</li>
-      <li>列表11</li>
-      <li>列表12</li>
-      <li>列表13</li>
-      <li>列表14</li>
-      <li>列表15</li>
-      <li>列表16</li>
-      <li>列表17</li>
-      <li>列表18</li>
-      <li>列表19</li>
-      <li>列表20</li>
-      <li>列表21</li>
-      <li>列表22</li>
-      <li>列表23</li>
-      <li>列表24</li>
-      <li>列表25</li>
-      <li>列表26</li>
-      <li>列表27</li>
-      <li>列表28</li>
-      <li>列表29</li>
-      <li>列表30</li>
-      <li>列表31</li>
-      <li>列表32</li>
-      <li>列表33</li>
-      <li>列表34</li>
-      <li>列表35</li>
-      <li>列表36</li>
-      <li>列表37</li>
-      <li>列表38</li>
-      <li>列表39</li>
-      <li>列表40</li>
-      <li>列表41</li>
-      <li>列表42</li>
-      <li>列表43</li>
-      <li>列表44</li>
-      <li>列表45</li>
-      <li>列表46</li>
-      <li>列表47</li>
-      <li>列表48</li>
-      <li>列表49</li>
-      <li>列表50</li>
-      <li>列表51</li>
-      <li>列表52</li>
-      <li>列表53</li>
-      <li>列表54</li>
-      <li>列表55</li>
-      <li>列表56</li>
-      <li>列表57</li>
-      <li>列表58</li>
-      <li>列表59</li>
-      <li>列表60</li>
-      <li>列表61</li>
-      <li>列表62</li>
-      <li>列表63</li>
-      <li>列表64</li>
-      <li>列表65</li>
-      <li>列表66</li>
-      <li>列表67</li>
-      <li>列表68</li>
-      <li>列表69</li>
-      <li>列表70</li>
-      <li>列表71</li>
-      <li>列表72</li>
-      <li>列表73</li>
-      <li>列表74</li>
-      <li>列表75</li>
-      <li>列表76</li>
-      <li>列表77</li>
-      <li>列表78</li>
-      <li>列表79</li>
-      <li>列表80</li>
-      <li>列表81</li>
-      <li>列表82</li>
-      <li>列表83</li>
-      <li>列表84</li>
-      <li>列表85</li>
-      <li>列表86</li>
-      <li>列表87</li>
-      <li>列表88</li>
-      <li>列表89</li>
-      <li>列表90</li>
-      <li>列表91</li>
-      <li>列表92</li>
-      <li>列表93</li>
-      <li>列表94</li>
-      <li>列表95</li>
-      <li>列表96</li>
-      <li>列表97</li>
-      <li>列表98</li>
-      <li>列表99</li>
-      <li>列表100</li>
-    </ul>
+  <div id="Category">
+    <navbar>
+       <div slot="center">商品分类</div>
+    </navbar>
+    <scroll class="content1" ref="scroll1" :isBounce='false'>
+      <cate-gory-title :titleList='cateGoryList' @titleClick='titleClcik'/>
+    </scroll>
+    <scroll class="content2" ref="scroll2">
+      <cate-gory-list :subCateGoryList='subCateGoryList'/>
+    </scroll>
   </div>
 </template>
 
 <script>
-import Bscroll from "better-scroll";
+import Navbar from 'common/navbar/Navbar.vue'
+import CateGoryList from 'content/cateGorys/CateGoryList.vue';
+
+import CateGoryTitle from './childComps/CateGoryTitle.vue';
+
+import Scroll from 'components/common/scroll/Scroll.vue';
+
+import { getcategory, getSubcategory } from "network/category.js";
+import { debounce } from "@/common/utils";
+
+
 
 export default {
   name: "Category",
-  data() {
+  data () {
     return {
-      scroll: null
-    };
+      cateGoryList:[],
+      subCateGoryList:[],
+      maitKey:0,
+      itemImgListener:null,
+    }
   },
-  mounted() {
-    this.scroll = new Bscroll(this.$refs.aaaa, {
-      probeType: 3,
-      pullUpLoad: true
-    });
-    this.scroll.on("scroll", position => {
-      // console.log(position);
-    });
-    this.scroll.on("pullingUp", () => {
-      console.log("上拉加载更多");
-    });
+  components: { 
+    Navbar,
+    CateGoryTitle,
+    Scroll,
+    CateGoryList,
+  },
+  // 当 vue 实例 创建完成后 立即调用
+  created () {
+    // 获取分类标题数据
+      getcategory().then(res=>{
+        // 获取 分类标题数据
+        this.cateGoryList = res.data.category.list
+        // 先获取第一个分类的 maitKey
+        this.maitKey = this.cateGoryList[0].maitKey
+        // 获取 第一个分类的数据
+        this.getSubcategorys()
+    })
+
+  },
+  // 页面处于活动状态 执行
+  activated () {
+    // 用 防抖函数 对 refresh(重新计算可滚动高度) 进行包装
+    let refresh1 = debounce(this.$refs.scroll1.refresh, 200)
+    let refresh2 = debounce(this.$refs.scroll2.refresh, 200)
+    this.itemImgListener = () => {
+      refresh1()
+      refresh2()
+    }
+    // 使用 事件总线的方式 来接收 图片加载完毕 发送的时间
+    this.$bus.$on('imgLoad',this.itemImgListener)
+  },
+ deactivated () {
+  //  当页面处于不活动状态 销毁 imgLoad 事件
+    this.$bus.$off('imgLoad',this.itemImgListener)
+ },
+  methods: {
+  // 点击标题 拿到对应的数据 
+   titleClcik(maitKey){
+    //  获取对应的  maitKey
+    this.maitKey = maitKey
+    // 根据对应的 maitKey 获取数据
+    this.getSubcategorys()
+   },
+  //  根据 maitKey 获取数据
+   getSubcategorys(){
+      getSubcategory(this.maitKey).then(res=>{
+        this.subCateGoryList = res.data.list
+    })
+   },
+   
   }
 };
 </script>
 
 <style scoped>
-.wrapper {
-  height: 150px;
-  background-color: pink;
+#Category{
+ height: 100vh;
+ background-color: #fff;
+ position: relative;
+}
+.content1{
+  background-color: #fff;
+  height: calc(100% - 44px - 49px);
+  overflow: hidden;
+}
+.content2{
+  width: 75%;
+  position: relative;
+  top: -573px;
+  right: -95px;
+  overflow: hidden;
+  background-color: #fff;
+  height: calc(100% - 44px - 49px);
+}
+.nav-bar{
+  background-color: var(--color-tint);
+  color: #fff;
 }
 </style>

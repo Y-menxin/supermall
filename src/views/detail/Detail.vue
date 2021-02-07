@@ -72,6 +72,7 @@ export default {
   },
   // 页面 初始化完成后 调用
   mounted() {},
+  // 当 vue 实例 创建完成后 立即调用
   created() {
     // 1.保存商品 id
     this.iid = this.$route.params.iid;
