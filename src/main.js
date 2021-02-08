@@ -5,7 +5,7 @@ import store from "./store";
 import FastClick from 'fastclick'
 import VuelazyLoad from "vue-lazyload"
 import toast from "./components/common/toast"
-
+import "@/assets/font/iconfont.css"
 Vue.config.productionTip = false
 
 // 如果要使用 事件总线 $bus 必须要在 vue 原型中挂载

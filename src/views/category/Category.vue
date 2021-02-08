@@ -101,7 +101,7 @@ export default {
   overflow: hidden;
 }
 .content2{
-  width: 75%;
+  width: 74%;
   position: relative;
   top: -573px;
   right: -95px;

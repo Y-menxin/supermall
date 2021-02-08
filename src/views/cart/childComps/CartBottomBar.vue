@@ -78,7 +78,7 @@ export default {
   display: flex;
   align-items: center;
   margin-left: 5px ;
-  width: 60px;
+  width: 65px;
 }
 .total{
   flex: 1;
